@@ -4,6 +4,8 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 import json
 import requests
+from kafka import KafkaProducer
+import time
 
 # default arguments 
 default_args = {
@@ -16,7 +18,24 @@ def data_stream():
     # extracting the data
     response = requests.get('https://randomuser.me/api/')
     # transforming the data
-    return transform_data(response.json()['results'][0])
+    transformed_data = transform_data(response.json()['results'][0])
+
+    # need to connect to the kafka queue to create a topic
+    # sending a single data point to the producer
+    producer = KafkaProducer(
+        # connecting to the Kafka broker on the localhost mounted to the docker container
+        bootstrap_servers=['localhost:9092'],
+        # max timeout
+        max_block_ms=5000
+        )
+    
+    # push the data to the queue
+    # a message will be sent to the kafka broker
+    producer.send(
+        'users_created',
+        json.dumps(data).encode('utf-8')
+    )
+
 
 
 def transform_data(api_response):
@@ -33,6 +52,7 @@ def transform_data(api_response):
     return data
 
 
+ 
 # DAG definition
 with DAG(
     'api_streaming',

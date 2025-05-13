@@ -1,0 +1,2 @@
+the script that is run by airflow to initialse the webserver
+this will be mounted to the airflow entrypoint script within the airflow container, so that it is run when the container is initialised

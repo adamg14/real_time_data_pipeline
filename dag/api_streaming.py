@@ -24,10 +24,13 @@ def data_stream():
     # sending a single data point to the producer
     producer = KafkaProducer(
         # connecting to the Kafka broker on the localhost mounted to the docker container
+        # change localhost to broker once the docker container for the kafka broker is running
         bootstrap_servers=['localhost:9092'],
         # max timeout
         max_block_ms=5000
         )
+
+    # stream data every minute
     
     # push the data to the queue
     # a message will be sent to the kafka broker

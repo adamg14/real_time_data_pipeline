@@ -102,7 +102,7 @@ services:
   webserver:
     image: apache/airflow:2.6.0-python3.9
     command: webserver
-    entrypoint: ['/opt/airflow/scripts/entrypoint.sh']
+    # entrypoint: ['/opt/airflow/scripts/entrypoint.sh']
     depends_on:
       - postgres
     environment:
@@ -154,7 +154,7 @@ services:
     environment:
         LOAD_EX: n
         EXECUTOR: Sequential
-        AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgres+psycopg2://airflow:airflow@posgres:5432/airflow
+        AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgres+psycopg2://airflow:airflow@postgres:5432/airflow
         AIRFLOW_WEBSERVER_SECRET_KEY: secret_key
     command:
         bash -c "pip install -r ./requirements.txt && airflow db upgrade && airflow scheduler"

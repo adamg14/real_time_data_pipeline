@@ -29,14 +29,14 @@ def data_stream():
         # max timeout
         max_block_ms=5000
         )
-
-    # stream data every minute
     
     # push the data to the queue
     # a message will be sent to the kafka broker
+    print("HELLO WORLD")
+    print(json.dumps(transformed_data))
     producer.send(
         'users_created',
-        json.dumps(data).encode('utf-8')
+        json.dumps(transformed_data).encode('utf-8')
     )
 
 
@@ -69,5 +69,4 @@ with DAG(
     )
 
 
-test_run = data_stream()
-print(json.dumps(test_run, indent=3))
+data_stream()

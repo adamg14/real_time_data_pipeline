@@ -6,6 +6,7 @@ import json
 import requests
 from kafka import KafkaProducer
 import time
+import logging
 
 # default arguments 
 default_args = {
@@ -15,30 +16,36 @@ default_args = {
 
 
 def data_stream():
-    # extracting the data
-    response = requests.get('https://randomuser.me/api/')
-    # transforming the data
-    transformed_data = transform_data(response.json()['results'][0])
 
     # need to connect to the kafka queue to create a topic
     # sending a single data point to the producer
     producer = KafkaProducer(
         # connecting to the Kafka broker on the localhost mounted to the docker container
         # change localhost to broker once the docker container for the kafka broker is running
-        bootstrap_servers=['localhost:9092'],
+        bootstrap_servers=['broker:29092'],
         # max timeout
         max_block_ms=5000
-        )
-    
-    # push the data to the queue
-    # a message will be sent to the kafka broker
-    print("HELLO WORLD")
-    print(json.dumps(transformed_data))
-    producer.send(
-        'users_created',
-        json.dumps(transformed_data).encode('utf-8')
     )
-
+    current_time = time.time()
+    while True:
+        if time.time() > current_time + 60:
+            break
+        else:
+            try:
+                # extracting the data
+                response = requests.get('https://randomuser.me/api/')
+                # transforming the data
+                transformed_data = transform_data(response.json()['results'][0])
+                # push the data to the queue
+                # a message will be sent to the kafka broker
+                producer.send(
+                    'users_created',
+                    json.dumps(transformed_data).encode('utf-8')
+                )
+            
+            except Exception as e:
+                logging.error(f"Error: {e}")
+                continue
 
 
 def transform_data(api_response):
@@ -68,5 +75,3 @@ with DAG(
         python_callable=data_stream
     )
 
-
-data_stream()

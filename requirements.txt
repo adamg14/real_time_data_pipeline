@@ -1,3 +1,5 @@
 apache-airflow==2.6.0
 requests
 kafka-python
+pyspark
+cassandra-driver
